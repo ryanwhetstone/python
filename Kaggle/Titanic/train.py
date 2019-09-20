@@ -66,7 +66,7 @@ df = pd.read_csv("data/converted/test.csv")
 P = pd.DataFrame(df['PassengerId'])
 X = df.drop('PassengerId', axis=1)
 
-pred_tree = clf_RF.predict(X)
+pred_tree = clf_KNN.predict(X)
 
 P['Survived'] = pred_tree
 

@@ -8,7 +8,6 @@ import lib.functions as f
 transformations = []
 # First drop these columns from the data
 transformations.append({
-    "Name": ["drop_column"],
     "Ticket": ["drop_column"],
     "PassengerId": ["drop_column"],
 })
@@ -19,13 +18,26 @@ transformations.append({
     "Age": ["nan_drop_row"],
 })
 
-# We can do intermediate transformations here. ie. just take the first character of each row and split into 4 bins
+transformations.append({
+    "Name": ["regex_extract", " ([A-Za-z]+)\."]
+})
+
+# We can do intermediate transformations here. ie. just take the first character of each row, split into 4 bins, etc
 transformations.append({
     "Cabin": ["first_character"],
     "Age": ["split" ],
     "Fare": ["split"],
     "SibSp": ["split"],
     "Parch": ["split"],
+    "Name": ["str_replace", ['Lady', 'Countess','Capt', 'Col','Don', 'Dr', 'Major', 'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare'],
+})
+
+transformations.append({
+    "Name": ["str_replace", ['Mlle', 'Ms'], 'Miss'],
+})
+
+transformations.append({
+    "Name": ["str_replace", 'Mme', 'Mrs'],
 })
 
 # Convert to from unique strings/character to a numeric code
@@ -35,6 +47,7 @@ transformations.append({
     "Age": ["numeric_categories"],
     "SibSp": ["numeric_categories"],
     "Parch": ["numeric_categories"],
+    # "Name": ["numeric_categories"],
 })
 
 # Final transformations
@@ -46,32 +59,20 @@ transformations.append({
     "Parch": ["one_hot"],
     "Age": ["one_hot"],
     "Fare": ["one_hot"],
+    "Name": ["one_hot"],
 })
 
 
 data_path = 'data/original/'
 data_file = 'train.csv'
 df = pd.read_csv(data_path + data_file)
-# f.print_df(df)
+
+f.print_df(df)
+
 
 for transformation in transformations:
     df = f.column_transformations(df, transformation)
 
-# titles = {"Mr": 1, "Miss": 2, "Mrs": 3, "Master": 4, "Rare": 5}
-
-# # extract titles
-# df['Title'] = df["Name"].str.extract(' ([A-Za-z]+)\.', expand=False)
-# # replace titles with a more common title or as Rare
-# df['Title'] = df['Title'].replace(['Lady', 'Countess','Capt', 'Col','Don', 'Dr',\
-#                                         'Major', 'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare')
-# df['Title'] = df['Title'].replace('Mlle', 'Miss')
-# df['Title'] = df['Title'].replace('Ms', 'Miss')
-# df['Title'] = df['Title'].replace('Mme', 'Mrs')
-# # convert titles into numbers
-# df['Title'] = df['Title'].map(titles)
-# # filling NaN with 0, to get safe
-# df['Title'] = df['Title'].fillna(0)
-# df = df.drop(['Name'], axis=1)
 
 f.print_df(df)
 

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import math
 from scipy.stats import pearsonr
-import lib.functions as f
+import lib.functions as functions
 
 
 df = pd.read_csv('data/original/train.csv')
@@ -80,13 +80,13 @@ for n in range(n_charts):
 
             if(df[col].dtype == np.float64 or df[col].dtype == np.int64):
                 data = df[col].fillna('-100').astype(float)
-                f.display_histogram(data, col, ax)
+                functions.display_histogram(data, col, ax)
                 corr, _ = pearsonr(data, df['Survived'])
             else:
                 unique_values = df[col].unique()
                 if(len(unique_values) < 10):
                     data = df[col].fillna('_').astype('category').cat.codes
-                    f.display_histogram(data, col, ax)
+                    functions.display_histogram(data, col, ax)
                     corr, _ = pearsonr(data, df['Survived'])
             print(corr)
             print('Pearsons correlation: %.3f' % corr)

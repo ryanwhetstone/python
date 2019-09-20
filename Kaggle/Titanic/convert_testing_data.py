@@ -9,7 +9,7 @@ import lib.functions as f
 transformations = []
 # First drop these columns from the data
 transformations.append({
-    "Name": ["drop_column"],
+    # "Name": ["drop_column"],
     "Ticket": ["drop_column"],
 })
 
@@ -20,13 +20,26 @@ transformations.append({
     "Fare": ["nan_mean"],
 })
 
-# We can do intermediate transformations here. ie. just take the first character of each row and split into 4 bins
+transformations.append({
+    "Name": ["regex_extract", " ([A-Za-z]+)\."]
+})
+
+# We can do intermediate transformations here. ie. just take the first character of each row, split into 4 bins, etc
 transformations.append({
     "Cabin": ["first_character"],
     "Age": ["split" ],
     "Fare": ["split"],
     "SibSp": ["split"],
     "Parch": ["split"],
+    "Name": ["str_replace", ['Lady', 'Countess','Capt', 'Col','Don', 'Dr', 'Major', 'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare'],
+})
+
+transformations.append({
+    "Name": ["str_replace", ['Mlle', 'Ms'], 'Miss'],
+})
+
+transformations.append({
+    "Name": ["str_replace", 'Mme', 'Mrs'],
 })
 
 # Convert to from unique strings/character to a numeric code
@@ -36,6 +49,7 @@ transformations.append({
     "Age": ["numeric_categories"],
     "SibSp": ["numeric_categories"],
     "Parch": ["numeric_categories"],
+    # "Name": ["numeric_categories"],
 })
 
 # Final transformations
@@ -47,6 +61,7 @@ transformations.append({
     "Parch": ["one_hot"],
     "Age": ["one_hot"],
     "Fare": ["one_hot"],
+    "Name": ["one_hot"],
 })
 
 
