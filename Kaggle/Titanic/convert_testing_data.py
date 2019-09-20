@@ -6,31 +6,40 @@ import math
 import lib.functions as f
 
 
-# Simply drop these columns from the data
-drop_columns = ["Name", "Ticket"]
+transformations = []
+# First drop these columns from the data
+transformations.append({
+    "Name": ["drop_column"],
+    "Ticket": ["drop_column"],
+})
 
-# How to handle Nan values (Current options are 'static', 'drop_row', 'mean')
-NaN_handling = {
-    "Cabin": ["static", "_"],
-    "Age": ["mean"],
-    "Fare": ["mean"],
-    # "Age": ["drop_row"]
-}
+# How to handle Nan values (Current options are 'nan_static', 'nan_drop_row', 'nan_mean')
+transformations.append({
+    "Cabin": ["nan_static", "_"],
+    "Age": ["nan_mean"],
+    "Fare": ["nan_mean"],
+})
 
-# We can do intermediate transformations here. ie. just take the first character of each row
-first_transformations = {
+# We can do intermediate transformations here. ie. just take the first character of each row and split into 4 bins
+transformations.append({
     "Cabin": ["first_character"],
-    "Age": ["split"],
+    "Age": ["split" ],
     "Fare": ["split"],
     "SibSp": ["split"],
     "Parch": ["split"],
-}
+})
 
 # Convert to from unique strings/character to a numeric code
-convert_to_numeric_categories = ["Sex", "Fare", "Age", "SibSp", "Parch"]
+transformations.append({
+    "Sex": ["numeric_categories"],
+    "Fare": ["numeric_categories"],
+    "Age": ["numeric_categories"],
+    "SibSp": ["numeric_categories"],
+    "Parch": ["numeric_categories"],
+})
 
 # Final transformations
-last_transformations = {
+transformations.append({
     "Embarked": ["one_hot"],
     "Cabin": ["one_hot"],
     "Pclass": ["one_hot"],
@@ -38,7 +47,8 @@ last_transformations = {
     "Parch": ["one_hot"],
     "Age": ["one_hot"],
     "Fare": ["one_hot"],
-}
+})
+
 
 
 data_path = 'data/original/'
@@ -46,15 +56,8 @@ data_file = 'test.csv'
 df = pd.read_csv(data_path + data_file)
 f.print_df(df)
 
-df = f.drop_columns(df, drop_columns)
-
-df = f.nan_columns(df, NaN_handling)
-
-df = f.column_transformations(df, first_transformations)
-
-df = f.convert_to_numerical_categories(df, convert_to_numeric_categories)
-
-df = f.column_transformations(df, last_transformations)
+for transformation in transformations:
+    df = f.column_transformations(df, transformation)
 
 f.print_df(df)
 
