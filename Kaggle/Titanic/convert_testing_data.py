@@ -6,64 +6,49 @@ import math
 import lib.functions as f
 
 
-transformations = []
-# First drop these columns from the data
-transformations.append({
-    # "Name": ["drop_column"],
-    "Ticket": ["drop_column"],
-})
+transformations = [
+    # [ "PassengerId", ["drop_column"] ],
+    ["Ticket",      ["drop_column"]],
 
-# How to handle Nan values (Current options are 'nan_static', 'nan_drop_row', 'nan_mean')
-transformations.append({
-    "Cabin": ["nan_static", "_"],
-    "Age": ["nan_mean"],
-    "Fare": ["nan_mean"],
-})
+    ["Cabin",       ["copy_column", "CabinBool"]],
+    ["Cabin",      	["drop_column"]],
+    ["Name",       	["copy_column", "Title"]],
+    ["Name",       	["drop_column"]],
 
-transformations.append({
-    "Name": ["regex_extract", " ([A-Za-z]+)\."]
-})
+    ["Age",         ["nan_mean"]],  # mean instead of drop
+    ["CabinBool",   ["nan_boolean"]],
+    ["Fare",        ["nan_mean"]],  # mean
 
-# We can do intermediate transformations here. ie. just take the first character of each row, split into 4 bins, etc
-transformations.append({
-    "Cabin": ["first_character"],
-    "Age": ["split" ],
-    "Fare": ["split"],
-    "SibSp": ["split"],
-    "Parch": ["split"],
-    "Name": ["str_replace", ['Lady', 'Countess','Capt', 'Col','Don', 'Dr', 'Major', 'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare'],
-})
+    # ["Cabin",       ["first_character"]],
 
-transformations.append({
-    "Name": ["str_replace", ['Mlle', 'Ms'], 'Miss'],
-})
+    ["Age",         ["split_by_defined", [0, 15, 25, 40, 60, 90]]],
+    ["Fare",        ["split_by_qcut", 4]],
+    ["Parch",       ["split_by_qcut", 4]],
+    ["SibSp",       ["split_by_qcut", 4]],
 
-transformations.append({
-    "Name": ["str_replace", 'Mme', 'Mrs'],
-})
+    ["Title",        ["regex_extract", " ([A-Za-z]+)\."]],
+    ["Title",        ["str_replace", ['Lady', 'Countess', 'Dona'], 'Royalty']],
+    ["Title",        ["str_replace", ['Capt', 'Col', 'Major', 'Rev'], 'Officer']],
+    ["Title",        ["str_replace", ['Jonkheer', 'Don', 'Sir'], 'Royalty']],
+    ["Title",        ["str_replace", ['Mlle', 'Ms'], 'Miss']],
+    ["Title",        ["str_replace", 'Mme', 'Mrs']],
 
-# Convert to from unique strings/character to a numeric code
-transformations.append({
-    "Sex": ["numeric_categories"],
-    "Fare": ["numeric_categories"],
-    "Age": ["numeric_categories"],
-    "SibSp": ["numeric_categories"],
-    "Parch": ["numeric_categories"],
-    # "Name": ["numeric_categories"],
-})
+    # [ "Age",         ["numeric_categories"] ],
+    # [ "Fare",        ["numeric_categories"] ],
+    # [ "Parch",       ["numeric_categories"] ],
+    # [ "Sex",         ["numeric_categories"] ],
+    # [ "SibSp",       ["numeric_categories"] ],
 
-# Final transformations
-transformations.append({
-    "Embarked": ["one_hot"],
-    "Cabin": ["one_hot"],
-    "Pclass": ["one_hot"],
-    "SibSp": ["one_hot"],
-    "Parch": ["one_hot"],
-    "Age": ["one_hot"],
-    "Fare": ["one_hot"],
-    "Name": ["one_hot"],
-})
-
+    ["Age",         ["one_hot"]],
+    # ["Cabin",       ["one_hot"]],
+    ["Embarked",    ["one_hot"]],
+    ["Fare",        ["one_hot"]],
+    # ["Name",        ["one_hot"]],
+    ["Parch",       ["one_hot"]],
+    ["Pclass",      ["one_hot"]],
+    ["Sex",         ["one_hot"]],
+    ["SibSp",       ["one_hot"]],
+]
 
 
 data_path = 'data/original/'
@@ -71,8 +56,8 @@ data_file = 'test.csv'
 df = pd.read_csv(data_path + data_file)
 f.print_df(df)
 
-for transformation in transformations:
-    df = f.column_transformations(df, transformation)
+for values in transformations:
+    df = f.column_transformation(df, values)
 
 f.print_df(df)
 
