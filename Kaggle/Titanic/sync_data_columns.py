@@ -39,12 +39,18 @@ if test_csv_files:
 
 # Now compare columns in training but not in the test data
 missing_cols = set( df_train.columns ) - set( df_test.columns )
-for c in missing_cols:
-    if c not in ignore_columns:
-        # df_train = df_train.drop(c, axis=1)
-        df_test[c] = 0
+missing_cols.discard(config.values['target_column'])
+missing_cols.discard(config.values['index_column'])
+if len(missing_cols) > 0:
+    print("Remove the following features because they don't exist in the test data. Add to the config file, then re-run.")
+    print("Alternatively, reconsider these features since you can't be sure they will be there in the wild.")
+    for c in missing_cols:
+        if c not in ignore_columns:
+            # df_train = df_train.drop(c, axis=1)
+            df_test[c] = 0
+            print('["' + c + '",       	["drop_column"]],')
 
-        # print(str(c) + " is in training data but not in the test data")
+            # print(str(c) + " is in training data but not in the test data")
 
 if train_csv_files:
     for c in missing_cols:

@@ -18,7 +18,7 @@ for values in transformations:
     df = f.column_transformation(df, values, df_all)
     df_all = f.column_transformation(df_all, values, df_all)
 
-df = f.remove_correlated_columns(df, 0.9)
+# df = f.remove_correlated_columns(df, 0.9)
 # f.column_heatmap(df)
 
 correlations = f.column_correlations(df, config.values['target_column'])

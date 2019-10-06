@@ -6,6 +6,7 @@
     "go": "python transform_training_data.py && python transform_testing_data.py && python compare_training_testing_data.py && python train.py",
     "train": "python init.py && python transform_training_data.py && python train_models.py",
     "predict": "python transform_testing_data.py && python sync_data_columns.py && python predict.py",
+    "full": "npm run train && npm run predict",
     "go2": "python transform_training_data.py && python transform_testing_data.py && python compare_training_testing_data.py && python train_multiple_feature_sets.py",
     "explore": "python explore_data.py"
   },
