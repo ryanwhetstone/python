@@ -4,45 +4,16 @@ import numpy as np
 import pandas as pd
 import math
 from scipy.stats import pearsonr
-import lib.functions as functions
+import lib.functions as f
+import config
 
+df = pd.read_csv(config.values['original_data_path'] + config.values['train_file'])
+# df = pd.read_csv(config.values['transformed_data_path'] + config.values['train_file'])
 
-df = pd.read_csv('data/original/train.csv')
-print('First ten rows')
-print()
-print(df.head(10))
-print()
-print("- Consider removing any column with uncorrelated data (ie. df.drop('Name', axis=1))")
-print(
-    "- Code text categorical data (ie. df['Gender'] = df['Gender'].astype('category').cat.codes)")
-print("- Consider converting NaN values to either a mean or something within a standard deviation of the median (this will lessen the effect of this column")
-print("- Consider converting NaN values to a number like -99 or something similar that will allow categorizing the column")
-print("- df['ColumnName'].fillna('_',inplace=True) # This replaces all NaN's with a static value")
-print("- df['ColumnName'] = df['ColumnName'].astype(str).str[0] # This pulls off the first character of a string")
-print("- df['ColumnName'] = df['ColumnName'].astype('category').cat.codes # This turns a column into a category type, then replaces text categories with integers representing the text categories")
-
-print()
-print('Table showing columns of the features and number of rows filled with data for each feature')
-print()
-df.info()
-print()
-print()
-print(df.describe())
+f.print_df(df)
 print()
 
-total = df.isnull().sum().sort_values(ascending=False)
-percent = (round(df.isnull().sum()*100 /
-                 df.isnull().count(), 2)).sort_values(ascending=False)
-missing_data = pd.concat([total, percent], axis=1, keys=[
-                         'Total Missing', 'Percent'])
-print(missing_data.head(10))
-
-f, ax = plt.subplots(figsize=(15, 8))
-plt.xticks(rotation='90')
-sns.barplot(x=missing_data.index, y=missing_data['Percent'])
-plt.xlabel('Features', fontsize=15)
-plt.ylabel('Percent of missing values', fontsize=15)
-plt.title('Percent missing data by feature', fontsize=15)
+f.show_missing_data(df)
 
 print()
 columns = df.columns.tolist()
@@ -80,16 +51,14 @@ for n in range(n_charts):
 
             if(df[col].dtype == np.float64 or df[col].dtype == np.int64):
                 data = df[col].fillna('-100').astype(float)
-                functions.display_histogram(data, col, ax)
-                corr, _ = pearsonr(data, df['Survived'])
+                f.display_histogram(data, col, ax)
             else:
                 unique_values = df[col].unique()
                 if(len(unique_values) < 10):
                     data = df[col].fillna('_').astype('category').cat.codes
-                    functions.display_histogram(data, col, ax)
-                    corr, _ = pearsonr(data, df['Survived'])
-            print(corr)
-            print('Pearsons correlation: %.3f' % corr)
+                    f.display_histogram(data, col, ax)
+
+correlations = f.column_correlations(df, config.values['target_column'])
 
 
 plt.show()
