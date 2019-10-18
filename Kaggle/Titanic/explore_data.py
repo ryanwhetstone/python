@@ -62,3 +62,9 @@ correlations = f.column_correlations(df, config.values['target_column'])
 
 
 plt.show()
+
+print()
+print("Starting point for transformations in the config file.")
+for col in df.columns.tolist():
+    if col != config.values["index_column"] and col != config.values["target_column"]:
+        print('["' + col + '",       	["drop_column"]],')
